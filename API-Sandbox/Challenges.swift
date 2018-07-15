@@ -10,6 +10,8 @@ import Foundation
 import SwiftyJSON
 
 internal func exerciseOne() {
+
+    
     // This would normally be network calls that return `NSData`. We'll show you how to do those soon!
     // In this case, we are using a local JSON file.
     guard let jsonURL = Bundle.main.url(forResource: "Random-User", withExtension: "json") else {
@@ -24,9 +26,11 @@ internal func exerciseOne() {
     // This JSON file contains the same data as the tutorial example.
     let userData = try! JSON(data: jsonData)
     
+    
     // Alright, now we have a JSON object from SwiftyJSON containing the user data!
     // Let's save the user's first name to a constant!
     let firstName = userData["results"][0]["name"]["first"].stringValue
+    
     // Do you see what we did there? We navigated down the JSON heirarchy, asked for "results",
     // then the first dictionary value of that array, then the dictionary stored in "name",
     // then the value stored in "first". We  then told it that we wanted the value as a string.
@@ -38,8 +42,26 @@ internal func exerciseOne() {
      "<first name> <last name> lives at <street name> in <city>, <state>, <post code>.
      If you want to contact <title>. <last name>, you can email <email address> or
      call at <cell phone number>."
-     
+
      */
+    let userInformation = userData["results"][0]
+    
+    
+    let LastName = userInformation["name"]["last"].stringValue
+    let streetName = userInformation["location"]["street"].stringValue
+    let city = userInformation["location"]["city"].stringValue
+    let state = userInformation["location"]["state"].stringValue
+    let postCode = userInformation["location"]["postcode"].intValue
+    let title = userInformation["name"]["title"].stringValue
+    let emailAddress = userInformation["email"].stringValue
+    let cellphoneNumber = userInformation["cell"].stringValue
+    
+    
+    print("""
+\(firstName) \(LastName) lives at \(streetName) in \(city), \(state), \(postCode).
+If you want to contact \(title). \(LastName), you can email \(emailAddress) or
+call at \(cellphoneNumber)
+""")
     
     
     
@@ -68,7 +90,7 @@ internal func exerciseTwo() {
     
     // Uncomment this print statement when you are ready to check your code!
     
-//    print("The top movie is \(topMovie.name) by \(topMovie.rightsOwner). It costs $\(topMovie.price) and was released on \(topMovie.releaseDate). You can view it on iTunes here: \(topMovie.link)")
+    print("The top movie is \(topMovie.name) by \(topMovie.rightsOwner). It costs $\(topMovie.price) and was released on \(topMovie.releaseDate). You can view it on iTunes here: \(topMovie.link)")
 }
 
 internal func exerciseThree() {
@@ -87,13 +109,29 @@ internal func exerciseThree() {
     
     // We've done you the favor of grabbing an array of JSON objects representing each movie
     let allMoviesData = moviesData["feed"]["entry"].arrayValue
-    
+
     /*
      
      Figure out a way to turn the allMoviesData array into Movie structs!
-     
+     var Movie: [allMoviesData] = []
+
      */
+
     var allMovies: [Movie] = []
+    
+    for jsonObject in allMoviesData {
+        allMovies.append(Movie(json: jsonObject))
+    }
+    
+    func printMovieNames(movies: [Movie]) {
+        for movie in movies {
+            print(movie.name)
+        }
+    }
+    
+    
+    
+
     
     
     
@@ -105,8 +143,16 @@ internal func exerciseThree() {
      contains the `String` "Disney". Iterate over all the values in `allMovies` to check!
      
      */
-//    print("The following movies are Disney movies:")
+    print("The following movies are Disney movies:")
     
+    let disneyMovies = allMovies.filter({
+        if $0.rightsOwner.lowercased().range(of: "disney") != nil {
+            return true
+        }
+        return false
+    })
+    
+    printMovieNames(movies: disneyMovies)
     
     
     
@@ -116,9 +162,33 @@ internal func exerciseThree() {
      movie that costs less than $15. Iterate over all the values in `allMovies` to check!
      
      */
-//    print("The following movies are cost less than $15:")
+    print("The following movies are cost less than $15:")
+    
+    let cheapMovies = allMovies.filter({
+        if $0.price < 15.00 {
+            return true
+        }
+        return false
+    })
+    
+    printMovieNames(movies: cheapMovies)
     
     
+    /*
+ extra exercise :
+ print all the prices of the movies
+ 
+    */
+    
+//    func printMoviePrices(movies: [Movie]) {
+//        for movie in movies {
+//            print(movie.price)
+//        }
+//    }
+//
+//    let prices = printMovieNames(movies: )
+//    print(prices)
+
     
     
     /*
@@ -127,7 +197,16 @@ internal func exerciseThree() {
      each movie released in 2016. Iterate over all the values in `allMovies` to check!
      
      */
-//    print("The following movies were released in 2016:")
+    print("The following movies were released in 2016:")
+    
+    let moviesIn2016 = allMovies.filter({
+        if $0.releaseDate.lowercased().range(of: "2016") != nil {
+            return true
+        }
+        return false
+    })
+    
+    printMovieNames(movies: moviesIn2016)
     
     
     
